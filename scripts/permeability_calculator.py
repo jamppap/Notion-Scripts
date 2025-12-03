@@ -56,7 +56,10 @@ def calculate_permeability(impedance, frequency, sample_dimensions):
     # Calculate inductance from impedance
     # Z = R + jωL for inductive component
     omega = 2 * np.pi * frequency
-    inductance = np.imag(impedance) / omega
+    
+    # Avoid division by zero for omega
+    with np.errstate(divide='ignore', invalid='ignore'):
+        inductance = np.where(omega != 0, np.imag(impedance) / omega, 0)
     
     # Calculate permeability
     # L = μ₀ μᵣ N² A / l
@@ -68,7 +71,11 @@ def calculate_permeability(impedance, frequency, sample_dimensions):
     # Also account for resistance (loss component)
     # The loss can be related to imaginary permeability
     resistance = np.real(impedance)
-    loss_factor = resistance / (omega * inductance) if np.any(inductance != 0) else 0
+    
+    # Avoid division by zero for loss factor calculation
+    with np.errstate(divide='ignore', invalid='ignore'):
+        denominator = omega * inductance
+        loss_factor = np.where(denominator != 0, resistance / denominator, 0)
     
     # Complex permeability
     mu_real = np.real(permeability)
