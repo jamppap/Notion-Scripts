@@ -8,6 +8,11 @@ measured with a Vector Network Analyzer (VNA).
 The calculation is based on the relationship between impedance and permeability
 for a toroidal core or similar magnetic sample configuration.
 
+NOTE: This is a simplified educational example. For more accurate results:
+- Account for air inductance (subtract L_air from measurements)
+- Use more sophisticated loss models for magnetic materials
+- Consider frequency-dependent effects and measurement uncertainties
+
 Author: Notion Scripts Collection
 License: MIT
 """
