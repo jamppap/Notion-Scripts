@@ -35,7 +35,7 @@ def calculate_permeability(impedance, frequency, sample_dimensions):
     
     Returns:
     --------
-    permeability : complex array
+    complex_permeability : complex array
         Complex permeability μ = μ' - jμ''
     mu_real : array
         Real part of permeability (μ')
@@ -47,6 +47,14 @@ def calculate_permeability(impedance, frequency, sample_dimensions):
     inner_d = sample_dimensions['inner_diameter']
     height = sample_dimensions['height']
     turns = sample_dimensions['turns']
+    
+    # Validate dimensions
+    if outer_d <= inner_d:
+        raise ValueError("Outer diameter must be greater than inner diameter")
+    if turns == 0:
+        raise ValueError("Number of turns must be greater than zero")
+    if height <= 0:
+        raise ValueError("Height must be greater than zero")
     
     # Calculate geometric parameters
     mean_diameter = (outer_d + inner_d) / 2
@@ -73,9 +81,11 @@ def calculate_permeability(impedance, frequency, sample_dimensions):
     resistance = np.real(impedance)
     
     # Avoid division by zero for loss factor calculation
+    # Check if either omega or inductance is zero
     with np.errstate(divide='ignore', invalid='ignore'):
         denominator = omega * inductance
-        loss_factor = np.where(denominator != 0, resistance / denominator, 0)
+        loss_factor = np.where((omega != 0) & (inductance != 0), 
+                               resistance / denominator, 0)
     
     # Complex permeability
     mu_real = np.real(permeability)
